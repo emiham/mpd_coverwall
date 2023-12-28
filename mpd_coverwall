@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+# Config
+COVER="/tmp/cover.png"
+MUSIC_DIR="${HOME}/music"
+WALLPAPER="${HOME}/pics/Wallpapers/wires.jpg"
+
+WIDTH=$(xrandr --query | grep 'primary' | awk '{print $4}' | cut -d 'x' -f1)
+HEIGHT=$(xrandr --query | grep 'primary' | awk '{print $4}' | cut -d 'x' -f2 | cut -d '+' -f1)
+
+get_cover() {
+    music_file="${MUSIC_DIR}/$(mpc current -f %file%)"
+    album_dir=$(echo "${music_file}" | sed "s/\/[^\/]*$//")
+    ffmpeg -i "${music_file}" "${COVER}" -y &> /dev/null || cp $(find "${album_dir}/" -regextype posix-egrep -regex '.*(cover|folder).*' | head -n 1) "${COVER}"
+}
+
+while "true"; do
+    status="`mpc status`"
+    if [[ ${status} == *"[playing]"* ]]; then
+        get_cover
+        magick "${COVER}" -write mpr:img +delete \
+            \( mpr:img -resize "${WIDTH}" +repage -blur 0x50 \) \
+            \( mpr:img -resize "%[fx:${HEIGHT} * .8]\>" -bordercolor white -border 10 \) \
+            \( +clone -background black -shadow 50x3+10+10 \) \
+            \( -clone 2,1 -background none -layers merge +repage \) \
+            -delete 1,2 \
+            -gravity center -compose over -composite "${COVER}"
+        xwallpaper --center "${COVER}"
+    elif [[ ${status} == *"[stopped]"* ]]; then
+        xwallpaper --zoom "${WALLPAPER}"
+    fi
+    mpc current --wait > /dev/null
+done
