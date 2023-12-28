@@ -1,11 +1,11 @@
 Small script to set your wallpaper to the album art of the currently playing
-`mpd` song.
+[`mpd`](https://www.musicpd.org/) song.
 
 ![example](./screenshot.png)
 
 # Dependencies
 
-`imagemagick` `xwallpaper` `mpc`
+`imagemagick xwallpaper mpc`
 
 # Installation
 
