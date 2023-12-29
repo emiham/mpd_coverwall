@@ -4,6 +4,7 @@
 COVER="/tmp/cover.png"
 MUSIC_DIR="${HOME}/music"
 WALLPAPER="${HOME}/pics/Wallpapers/wires.jpg"
+MAX_HEIGHT=.8
 
 WIDTH=$(xrandr --query | grep 'primary' | awk '{print $4}' | cut -d 'x' -f1)
 HEIGHT=$(xrandr --query | grep 'primary' | awk '{print $4}' | cut -d 'x' -f2 | cut -d '+' -f1)
@@ -20,7 +21,7 @@ while "true"; do
         get_cover
         magick "${COVER}" -write mpr:img +delete \
             \( mpr:img -resize "${WIDTH}" +repage -blur 0x50 \) \
-            \( mpr:img -resize "%[fx:${HEIGHT} * .8]\>" -bordercolor white -border 10 \) \
+            \( mpr:img -resize "%[fx:${HEIGHT} * ${MAX_HEIGHT}]\>" -bordercolor white -border 10 \) \
             \( +clone -background black -shadow 50x3+10+10 \) \
             \( -clone 2,1 -background none -layers merge +repage \) \
             -delete 1,2 \
