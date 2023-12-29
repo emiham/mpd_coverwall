@@ -15,8 +15,8 @@ get_cover() {
 }
 
 while "true"; do
-    status="`mpc status`"
-    if [[ ${status} == *"[playing]"* ]]; then
+    status="`mpc status %state%`"
+    if [[ ${status} == "playing" || ${status} == "paused" ]]; then
         get_cover
         magick "${COVER}" -write mpr:img +delete \
             \( mpr:img -resize "${WIDTH}" +repage -blur 0x50 \) \
@@ -26,7 +26,7 @@ while "true"; do
             -delete 1,2 \
             -gravity center -compose over -composite "${COVER}"
         xwallpaper --center "${COVER}"
-    elif [[ ${status} == *"[stopped]"* ]]; then
+    elif [[ ${status} == "stopped" ]]; then
         xwallpaper --zoom "${WALLPAPER}"
     fi
     mpc current --wait > /dev/null
