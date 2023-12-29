@@ -5,7 +5,7 @@ Small script to set your wallpaper to the album art of the currently playing
 
 # Dependencies
 
-`imagemagick xwallpaper mpc`
+`imagemagick xrandr xwallpaper mpc`
 
 # Installation
 
