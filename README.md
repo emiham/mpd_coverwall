@@ -10,7 +10,7 @@ monitor height if too large.
 
 # Dependencies
 
-`imagemagick xwallpaper mpc`
+`imagemagick xrandr xwallpaper mpc`
 
 # Installation
 
