@@ -1,5 +1,10 @@
 Small script to set your wallpaper to the album art of the currently playing
-[`mpd`](https://www.musicpd.org/) song.
+[`mpd`](https://www.musicpd.org/) song. Currently it looks for embedded art
+first, and then falls back to a file with a name containing `folder` or `cover`
+in the same folder as the music file.
+
+The size depends on the size of the image, and is scaled down to 80% of the
+monitor height if too large.
 
 ![example](./screenshot.png)
 
