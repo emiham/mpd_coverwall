@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+
+# Config
+COVER="/tmp/cover.png"
+COVER_TMP="/tmp/cover_old.png"
+COVER_FINAL="/tmp/cover_final.png"
+MUSIC_DIR="${HOME}/music"
+WALLPAPER="${HOME}/pics/wallpapers/tyasui/FALLBACK.jpg"
+MAX_HEIGHT=.8
+BORDER_COLOR="white"
+BORDER_SIZE=10
+WALLPAPER_COMMAND="swww img"
+
+WIDTH=$(wlr-randr | grep current | awk '{print $1}' | cut -d 'x' -f1)
+HEIGHT=$(wlr-randr | grep current | awk '{print $1}' | cut -d 'x' -f2)
+SCALE=$(wlr-randr | grep Scale | awk '{print $2}')
+
+if [[ $MPD_HOST == "" ]]; then
+  MPD_HOST="127.0.0.1"
+fi
+
+if [[ $MPD_PORT == "" ]]; then
+  MPD_PORT=6600
+fi
+
+get_cover() {
+  mv $COVER "${COVER_TMP}"
+  music_file="${MUSIC_DIR}/$(mpc current -f %file%)"
+  album_dir=$(echo "${music_file}" | sed "s/\/[^\/]*$//")
+  current_song="$(mpc current)"
+  if ffmpeg -i "${music_file}" "${COVER}" -y &> /dev/null; then
+    echo "Found embedded art for $current_song"
+  else
+    music_file=$(find "${album_dir}/" -regextype posix-egrep -regex '.*(cover|folder).*' | head -n 1)
+    cp "$music_file" "${COVER}" \
+      && echo "Found art in folder for $current_song" \
+      || echo "Could not find art for $current_song"
+  fi
+  cmp -s "${COVER_TMP}" "${COVER}"
+  return $((! $?))
+}
+
+while "true"; do
+  status="$(mpc status %state%)"
+  if get_cover; then
+    echo "Cover different from last, changing wallpaper"
+    if [[ ${status} == "playing" || ${status} == "paused" ]]; then
+      magick "${COVER}" -write mpr:img +delete \
+        \( mpr:img -resize "${WIDTH}" +repage -blur 0x50 \) \
+        \( mpr:img -resize "%[fx:${HEIGHT} * ${MAX_HEIGHT}]\>" -bordercolor ${BORDER_COLOR} -border ${BORDER_SIZE} \) \
+        \( +clone -background black -shadow 50x3+10+10 \) \
+        \( -clone 2,1 -background none -layers merge +repage \) \
+        -delete 1,2 \
+        -gravity center -compose over -composite "${COVER_FINAL}"
+      eval "$WALLPAPER_COMMAND ${COVER_FINAL} &"
+    elif [[ ${status} == "MPD error: Connection refused" ]]; then
+      sleep 1
+      continue
+    else
+      echo "mpd status: $status"
+      eval "$WALLPAPER_COMMAND ${WALLPAPER} &"
+    fi
+  fi
+  mpc current --wait > /dev/null
+done
