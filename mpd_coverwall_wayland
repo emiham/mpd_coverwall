@@ -41,6 +41,7 @@ get_cover() {
   return $((! $?))
 }
 
+MAGICK_OCL_DEVICE=true
 while "true"; do
   status="$(mpc status %state%)"
   if get_cover; then
