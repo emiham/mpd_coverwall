@@ -9,6 +9,7 @@ WALLPAPER="${HOME}/pics/wallpapers/tyasui/FALLBACK.jpg"
 MAX_HEIGHT=.8
 BORDER_COLOR="white"
 BORDER_SIZE=10
+BLUR=6
 WALLPAPER_COMMAND="swww img"
 
 WIDTH=$(wlr-randr | grep current | awk '{print $1}' | cut -d 'x' -f1)
@@ -46,7 +47,7 @@ while "true"; do
     echo "Cover different from last, changing wallpaper"
     if [[ ${status} == "playing" || ${status} == "paused" ]]; then
       magick "${COVER}" -write mpr:img +delete \
-        \( mpr:img -resize "${WIDTH}" +repage -blur 0x50 \) \
+        \( mpr:img -blur 0x${BLUR} -resize "${WIDTH}x${HEIGHT}^" +repage \) \
         \( mpr:img -resize "%[fx:${HEIGHT} * ${MAX_HEIGHT}]\>" -bordercolor ${BORDER_COLOR} -border ${BORDER_SIZE} \) \
         \( +clone -background black -shadow 50x3+10+10 \) \
         \( -clone 2,1 -background none -layers merge +repage \) \
