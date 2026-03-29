@@ -1,3 +1,5 @@
+# mpd_coverwall
+
 Small script to set your wallpaper to the album art of the currently playing
 [`mpd`](https://www.musicpd.org/) song. Currently it looks for embedded art
 first, and then falls back to a file with a name containing `folder` or `cover`
@@ -8,11 +10,11 @@ monitor height if too large.
 
 ![example](./screenshot.png)
 
-# Dependencies
+## Dependencies
 
 `imagemagick xrandr xwallpaper mpc`
 
-# Installation
+## Installation
 
 Run the script continuously somewhere. Personally I do this by putting the
 following in my `.xinitrc`:
